@@ -50,6 +50,10 @@ namespace BishHouse2.Services
             {
                 await channel.SendMessageAsync("I don't know how to read.");
             }
+            else
+            {
+                await message.Channel.SendMessageAsync("I can't read.");
+            }
         }
 
         private async Task OnPresenceUpdated(SocketUser user, SocketPresence before, SocketPresence after)

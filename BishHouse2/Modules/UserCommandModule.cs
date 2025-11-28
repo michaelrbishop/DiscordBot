@@ -1,6 +1,7 @@
 ﻿using BishHouse2.Components;
 using BishHouse2.Repository;
 using BishHouse2.Repository.Models;
+using BishHouse2.Services;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
@@ -15,10 +16,12 @@ namespace BishHouse2.Modules
     public class UserCommandModule : InteractionModuleBase<SocketInteractionContext>
     {
         private readonly IUserRepository _userRepository;
+        private readonly IDadJokeService _dadJokeService;
 
-        public UserCommandModule(IUserRepository userRepository)
+        public UserCommandModule(IUserRepository userRepository, IDadJokeService dadJokeService)
         {
             _userRepository = userRepository;
+            _dadJokeService = dadJokeService;
         }
 
         [SlashCommand("change-my-nickname", "Change your display name for this server")]
@@ -65,6 +68,14 @@ namespace BishHouse2.Modules
                 userModel?.System ?? null
             );
             await Context.Interaction.RespondWithModalAsync(modal.Build());
+        }
+
+        [SlashCommand("dad-joke", "Get a random dad joke")]
+        [RequireContext(ContextType.Guild)]
+        public async Task GetDadJoke()
+        {
+            var joke = await _dadJokeService.GetRandomDadJoke();
+            await RespondAsync(joke, isTTS: true);
         }
     }
 }

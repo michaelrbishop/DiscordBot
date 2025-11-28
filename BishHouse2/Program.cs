@@ -49,6 +49,7 @@ using IHost host = Host.CreateDefaultBuilder(args)
         services.AddTransient<IUserRepository, UserRepository>();
         services.AddMemoryCache();
         services.AddTransient<IRepositoryFactory, RepositoryFactory>();
+        services.AddHttpClient<IDadJokeService, DadJokeService>();
 
     })
     .Build();
