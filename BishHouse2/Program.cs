@@ -10,14 +10,27 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 
 using IHost host = Host.CreateDefaultBuilder(args)
+    .ConfigureAppConfiguration((hostingContext, config) =>
+    {
+        var env = hostingContext.HostingEnvironment;
+
+        if (!env.IsProduction())
+        {
+             config.AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: false, reloadOnChange: true);
+        }
+        else
+        {
+            config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+        }
+         
+    })
     .ConfigureServices((context, services) =>
     {
         services.AddDbContextFactory<DiscordDBContext>(opt =>
                 opt.UseSqlServer(context.Configuration.GetConnectionString("DiscordDB")));
-        //services.AddDbContext<DiscordDBContext>(opt => 
-        //    opt.UseSqlServer(context.Configuration.GetConnectionString("DiscordDB")));
 
         services.ConfigureDiscordSocketClient();
         services.AddSingleton(x =>

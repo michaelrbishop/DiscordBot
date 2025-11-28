@@ -43,8 +43,11 @@ namespace BishHouse2.Modules
             {
                 msg = $"I don't fucking know who {user.Mention} is. I just work here.";
             }
+            else
+            {
+                msg = $"{user.Mention} is known as {dbUser.FirstName} {dbUser.LastInitial}. They are running the {dbUser.System} system.";
+            }
 
-            msg = $"{user.Mention} is known as {dbUser.FirstName} {dbUser.LastInitial}. They are running the {dbUser.System} system.";
 
             await RespondAsync(msg, ephemeral: true);
         }

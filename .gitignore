@@ -362,3 +362,4 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /BishHouse2/appsettings.json
+/BishHouse2/appsettings.local.json
