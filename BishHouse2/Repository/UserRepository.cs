@@ -24,6 +24,9 @@ namespace BishHouse2.Repository
         }
         public async Task Add(User user)
         {
+            Console.WriteLine("");
+            Console.WriteLine($"Added a new user {user.FirstName} - {user.DiscordId}");
+
             // TODO : MRB Add user to in-memory cache
             user.CreatedAt = DateTime.UtcNow;
             user.UpdateAt = DateTime.UtcNow;
@@ -84,6 +87,11 @@ namespace BishHouse2.Repository
 
         public async Task Update(User user)
         {
+            Console.WriteLine("");
+            Console.WriteLine($"Updated a user: {user.FirstName}");
+            Console.WriteLine("");
+
+
             user.UpdateAt = DateTime.UtcNow;
 
             _dBContext.Users.Update(user);

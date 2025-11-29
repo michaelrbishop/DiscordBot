@@ -2,13 +2,8 @@
 using Discord;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using BishHouse2.Util;
+using Serilog;
 
 namespace BishHouse2.Services
 {
@@ -16,9 +11,9 @@ namespace BishHouse2.Services
     {
         private readonly DiscordSocketClient _discord;
         private readonly IConfiguration _config;
-        private readonly ILogger<DiscordSocketClient> _logger;
+        private readonly ILogger _logger;
 
-        public DiscordStartupService(DiscordSocketClient discord, IConfiguration config, ILogger<DiscordSocketClient> logger)
+        public DiscordStartupService(DiscordSocketClient discord, IConfiguration config, ILogger logger)
         {
             _discord = discord;
             _config = config;
@@ -29,19 +24,19 @@ namespace BishHouse2.Services
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            Console.WriteLine("Logging into Discord...");
+            _logger.Information("Logging into Discord...");
             await _discord.LoginAsync(TokenType.Bot, _config["Discord:Token"]);
 
-            Console.WriteLine("Starting Discord client...");
+            _logger.Information("Starting Discord client...");
             await _discord.StartAsync();
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            Console.WriteLine("Logging out of Discord...");
+            _logger.Information("Logging out of Discord...");
             await _discord.LogoutAsync();
 
-            Console.WriteLine("Stopping Discord client...");
+            _logger.Information("Stopping Discord client...");
             await _discord.StopAsync();
         }
     }

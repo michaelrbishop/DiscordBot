@@ -1,29 +1,23 @@
 ﻿using BishHouse2.Components;
 using BishHouse2.Repository;
-using BishHouse2.Repository.Data;
 using BishHouse2.Repository.Factory;
-using BishHouse2.Repository.Models;
 using Discord.WebSocket;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Serilog;
 
 namespace BishHouse2.Services
 {
     public class ComponentInteractionHandlingService : BackgroundService
     {
         private readonly DiscordSocketClient _discord;
+        private readonly ILogger _logger;
         private readonly IUserRepository _userRepository;
 
         public ComponentInteractionHandlingService(DiscordSocketClient discord,
-            IRepositoryFactory repositoryFactory)
+            IRepositoryFactory repositoryFactory, ILogger logger)
         {
             _discord = discord;
+            _logger = logger;
             _userRepository = repositoryFactory.CreateRepository<IUserRepository>();
         }
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -58,6 +52,7 @@ namespace BishHouse2.Services
                 dbUser!.LastInitial = lastInitial![0];
                 dbUser!.System = system!;
                 dbUser!.IsConfirmed = true;
+                dbUser!.ConfirmedAt = DateTime.UtcNow;
 
                 await _userRepository.Update(dbUser);
 

@@ -30,10 +30,15 @@ namespace BishHouse2.Modules
         [RequireBotPermission(GuildPermission.ChangeNickname)]
         public async Task ChangeUserNickname(string nickname)
         {
+
             var user = (SocketGuildUser)Context.User;
 
             await user.ModifyAsync(x => x.Nickname = nickname);
             await RespondAsync($"{user.Mention} your display name has changed to {nickname}");
+
+            Console.WriteLine("");
+            Console.WriteLine($"{user.Username} called change-my-nickname");
+            Console.WriteLine("");
         }
 
         [SlashCommand("who-is", "Get info on a user. The message sent is only viewable by you.")]
@@ -53,6 +58,10 @@ namespace BishHouse2.Modules
 
 
             await RespondAsync(msg, ephemeral: true);
+
+            Console.WriteLine("");
+            Console.WriteLine($"{Context.User.Username} called who-is");
+            Console.WriteLine("");
         }
 
         [SlashCommand("update-my-info", "Update your user information")]
@@ -68,6 +77,10 @@ namespace BishHouse2.Modules
                 userModel?.System ?? null
             );
             await Context.Interaction.RespondWithModalAsync(modal.Build());
+
+            Console.WriteLine("");
+            Console.WriteLine($"{user.Username} called update-my-info");
+            Console.WriteLine("");
         }
 
         [SlashCommand("dad-joke", "Get a random dad joke")]
@@ -76,6 +89,45 @@ namespace BishHouse2.Modules
         {
             var joke = await _dadJokeService.GetRandomDadJoke();
             await RespondAsync(joke, isTTS: true);
+
+            Console.WriteLine("");
+            Console.WriteLine($"{Context.User.Username} called dad-joke");
+            Console.WriteLine("");
+        }
+
+        [SlashCommand("who-me", "IYKYK")]
+        [RequireContext(ContextType.Guild)]
+        public async Task WhoMe()
+        {
+            await RespondAsync("https://www.youtube.com/watch?v=hmftwy8PPfM", ephemeral: true);
+
+            Console.WriteLine("");
+            Console.WriteLine($"{Context.User.Username} called who-me");
+            Console.WriteLine("");
+        }
+
+        [SlashCommand("kill-me", "Just do it.")]
+        [RequireContext(ContextType.Guild)]
+        [RequireUserPermission(GuildPermission.Administrator)]
+        public async Task KillMe()
+        {
+            var user = (IGuildUser)Context.User;
+           if (!user.GuildPermissions.Administrator)
+            {
+                Console.WriteLine("");
+                Console.WriteLine($"{user.Username} tried to kill me.");
+                Console.WriteLine("");
+
+                await RespondAsync("You can't kill me, motherfucker.", ephemeral: true);
+                return;
+            }
+
+            Console.WriteLine("");
+            Console.WriteLine($"{Context.User.Username} called kill-me");
+            Console.WriteLine("");
+
+            await RespondAsync("Shutting down...");
+            Environment.Exit(0);
         }
     }
 }

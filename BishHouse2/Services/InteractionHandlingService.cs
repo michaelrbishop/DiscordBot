@@ -1,17 +1,11 @@
-﻿using BishHouse2.Components;
-using BishHouse2.Util;
+﻿using BishHouse2.Util;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Serilog;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BishHouse2.Services
 {
@@ -21,14 +15,14 @@ namespace BishHouse2.Services
         private readonly InteractionService _interactions;
         private readonly IServiceProvider _services;
         private readonly IConfiguration _config;
-        private readonly ILogger<InteractionService> _logger;
+        private readonly ILogger _logger;
 
         public InteractionHandlingService(
             DiscordSocketClient discord,
             InteractionService interactions,
             IServiceProvider services,
             IConfiguration config,
-            ILogger<InteractionService> logger)
+            ILogger logger)
         {
             _discord = discord;
             _interactions = interactions;

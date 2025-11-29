@@ -9,6 +9,7 @@ using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,15 +21,17 @@ namespace BishHouse2.Services
     public class UserMonitorService : BackgroundService
     {
         private readonly DiscordSocketClient _discord;
+        private readonly ILogger _logger;
         private readonly IUserRepository _userRepository;
         private InternalDictionary<(User, DateTime)> _internalDictionary;
 
         public UserMonitorService(
             DiscordSocketClient discord,
-            IRepositoryFactory repositoryFactory)
+            IRepositoryFactory repositoryFactory, ILogger logger)
         {
 
             _discord = discord;
+            _logger = logger;
             _userRepository = repositoryFactory.CreateRepository<IUserRepository>();
             _internalDictionary = new InternalDictionary<(User, DateTime)>();
         }
@@ -48,11 +51,20 @@ namespace BishHouse2.Services
 
             if (message.Channel is IDMChannel channel)
             {
+                _logger.Information($"{message.Author.Username} sent me a dm.");
+                _logger.Information($"{message.Content}");
+
                 await channel.SendMessageAsync("I don't know how to read.");
             }
             else
             {
-                await message.Channel.SendMessageAsync("I can't read.");
+                if (message.MentionedUsers.Any(x => x.Id == _discord.CurrentUser.Id))
+                {
+                    _logger.Information($"{message.Author.Username} mentioned me");
+
+                    await message.Channel.SendMessageAsync("I can't read.");
+                }
+
             }
         }
 
@@ -83,11 +95,22 @@ namespace BishHouse2.Services
 
                 if (dbUser is not null && !dbUser.IsConfirmed)
                 {
-                    if (DateOnly.FromDateTime(dbUser.UpdateAt) < DateOnly.FromDateTime(DateTime.UtcNow))
+                    
+                    if (DateOnly.FromDateTime(dbUser.UpdateAt) < DateOnly.FromDateTime(DateTime.UtcNow)) // TODO : MRB Use confirm at
                     {
-                        await user.SendMessageAsync(
-                            components: UserInfoForm.InitialComponent((SocketGuildUser)user).Build(),
-                            isTTS: true);
+                        _logger.Information($"I sent a dm for more info to {user.Username}");
+
+                        try
+                        {
+                            await user.SendMessageAsync(
+                                    components: UserInfoForm.InitialComponent((SocketGuildUser)user).Build(),
+                                    isTTS: true);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Error(ex, $"Error sending DM to {user.Username}");
+                        }
+                        }
 
                         // The repository will update the UpdateAt field
                         await _userRepository.Update(dbUser);
@@ -186,9 +209,7 @@ namespace BishHouse2.Services
 
                     var guildUser = guildUsers.First(x => x.Id == guildUserResult.DiscordId);
                     
-                    await AddUser(guildUser);   
-
-                    Console.WriteLine($"Added new user {guildUser.Username} to the database.");
+                    await AddUser(guildUser);
                 }
             }
         }
@@ -201,13 +222,12 @@ namespace BishHouse2.Services
             if (user is null)
             {
                 await AddUser(guildUser);
-
-                Console.WriteLine($"Added new user {guildUser.Username} to the database.");
             }
         }
 
         private async Task AddUser(SocketGuildUser guildUser)
         {
+
             User newUser = new()
             {
                 DiscordId = guildUser.Id,
@@ -234,7 +254,7 @@ namespace BishHouse2.Services
             catch (TaskCanceledException)
             {
                 // Gracefully handle cancellation, no action needed
-                Console.WriteLine("UserMonitorService cancellation requested.");
+                _logger.Information("UserMonitorService cancellation requested.");
             }
         }
     }

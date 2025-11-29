@@ -72,7 +72,7 @@ namespace BishHouse2.Components
         {
             var builder = new ComponentBuilderV2()
                     .WithTextDisplay(
-                    $"{user.Mention}, I don't know who the fuck you are. Fill out the form so I know.");
+                    $"I'm from Modern Asbestos & More. {user.Mention}, I don't know who the fuck you are. Fill out the form so I know.");
 
             var buttonBuilder = new ButtonBuilder("Sell your soul!")
                                         .WithStyle(ButtonStyle.Primary)

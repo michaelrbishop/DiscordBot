@@ -1,10 +1,6 @@
 ﻿using Discord;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Serilog;
+
 
 namespace BishHouse2.Util
 {
@@ -15,23 +11,23 @@ namespace BishHouse2.Util
             switch (msg.Severity)
             {
                 case LogSeverity.Verbose:
-                    logger.LogInformation(msg.ToString());
+                    logger.Information(msg.ToString());
                     break;
 
                 case LogSeverity.Info:
-                    logger.LogInformation(msg.ToString());
+                    logger.Information(msg.ToString());
                     break;
 
                 case LogSeverity.Warning:
-                    logger.LogWarning(msg.ToString());
+                    logger.Warning(msg.ToString());
                     break;
 
                 case LogSeverity.Error:
-                    logger.LogError(msg.ToString());
+                    logger.Error(msg.ToString());
                     break;
 
                 case LogSeverity.Critical:
-                    logger.LogCritical(msg.ToString());
+                    logger.Fatal(msg.ToString());
                     break;
             }
             return Task.CompletedTask;

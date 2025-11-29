@@ -6,13 +6,18 @@ using BishHouse2.Services;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 
 using IHost host = Host.CreateDefaultBuilder(args)
+    .UseSerilog((context, services, configuration) =>
+    {
+        configuration
+            .ReadFrom.Configuration(context.Configuration);
+            //.Enrich.FromLogContext();
+    })
     .ConfigureAppConfiguration((hostingContext, config) =>
     {
         var env = hostingContext.HostingEnvironment;
@@ -54,7 +59,18 @@ using IHost host = Host.CreateDefaultBuilder(args)
     })
     .Build();
 
-await host.RunAsync();
+try
+{
+    await host.RunAsync();
+}
+catch (Exception ex)
+{
+    Log.Error(ex, "An error occurred while running the host");
+}
+finally
+{
+       Log.CloseAndFlush();
+}
 
 
 // TODO : MRB
