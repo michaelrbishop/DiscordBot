@@ -363,3 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 /BishHouse2/appsettings.json
 /BishHouse2/appsettings.local.json
+/BishHouse2/appsettings.development.json
+/BishHouse2/appsettings.json

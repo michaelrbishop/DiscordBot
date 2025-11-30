@@ -14,13 +14,23 @@ using Serilog;
 using IHost host = Host.CreateDefaultBuilder(args)
     .UseSerilog((context, services, configuration) =>
     {
-        configuration
-            .ReadFrom.Configuration(context.Configuration);
-            //.Enrich.FromLogContext();
+        if (!context.HostingEnvironment.IsProduction())
+        {
+            configuration
+                .ReadFrom.Configuration(context.Configuration);
+        } 
+        else
+        {
+            configuration
+                .MinimumLevel.Information()
+                .WriteTo.Console();
+        }
+
+
     })
     .ConfigureAppConfiguration((hostingContext, config) =>
     {
-        var env = hostingContext.HostingEnvironment;
+        var env = hostingContext.HostingEnvironment;        
 
         if (!env.IsProduction())
         {
@@ -28,7 +38,7 @@ using IHost host = Host.CreateDefaultBuilder(args)
         }
         else
         {
-            config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+            config.AddEnvironmentVariables();
         }
          
     })
@@ -71,18 +81,3 @@ finally
 {
        Log.CloseAndFlush();
 }
-
-
-// TODO : MRB
-// Create UserDomain
-
-// Create repository to write user data to a db
-// Create hosted IMemoryCache for user data
-
-
-// On startup grab all users of guild and check against db
-// If they don't exist, add them to the db and then the in memory cache
-
-// Create handle for message event to check if we know the user
-// If we don't know the user, send them an efhemeral form to add their info
-

@@ -110,7 +110,7 @@ namespace BishHouse2.Services
                         {
                             _logger.Error(ex, $"Error sending DM to {user.Username}");
                         }
-                        }
+                        
 
                         // The repository will update the UpdateAt field
                         await _userRepository.Update(dbUser);
